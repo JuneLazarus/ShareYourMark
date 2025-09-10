@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ShareYourMark</title>
+    <link rel="shortcut icon" href="title.jpg">
+    <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+</head>
+<body>
+    <div style="text-align:center" class="box">
+        <h2 class="text">Hello, World!</h2>
+        <button onclick="myFunction()">Click me</button>
+    </div>
+    <input type="file" id="mdfile" accept=".md" style="display:none;">
+<button id="mdfile-btn">Select file</button>
+<div id="markdown-content"></div>
+    
+    <script src="test.js"></script>
+    <script>
+        function myFunction() {
+            alert("Nothing happened.");
+        }
+let whatcanisay = [];
+try {
+    const saved = localStorage.getItem('whatcanisay');
+    if (saved) whatcanisay = JSON.parse(saved);
+} catch (e) {
+    whatcanisay = [];
+}
+
+const container = document.createElement("div");
+container.style.color = "rgba(255,255,255,0.75)";
+container.style.fontSize = "1.2rem";
+container.style.textAlign = "center";
+container.style.padding = "1rem";
+container.style.width = "61.8%";
+container.style.margin = "0 auto";
+document.body.appendChild(container);
+
+function showList() {
+    container.innerHTML = "";
+    whatcanisay.forEach((item, idx) => {
+        const itemSpan = document.createElement("span");
+        itemSpan.textContent = item;
+        itemSpan.style.display = "inline-block";
+        itemSpan.style.margin = "0.5rem 0";
+        itemSpan.style.cursor = "pointer";
+        itemSpan.style.width = "100%";
+        itemSpan.title = "点击删除此项";
+        itemSpan.onclick = () => {
+            whatcanisay.splice(idx, 1);
+            localStorage.setItem('whatcanisay', JSON.stringify(whatcanisay));
+            showList();
+        };
+        container.appendChild(itemSpan);
+    });
+}
+showList();
+
+const btn = document.createElement("button");
+btn.innerText = "Add content";
+btn.style.margin = "1rem";
+document.body.appendChild(btn);
+
+btn.onclick = function () {
+    const input = prompt("Enter content:");
+    if (input) {
+        whatcanisay.push(input);
+        localStorage.setItem('whatcanisay', JSON.stringify(whatcanisay));
+        showList();
+    }
+};
+
+const mdfileInput = document.getElementById('mdfile');
+const mdfileBtn = document.getElementById('mdfile-btn');
+mdfileBtn.style.width = "6rem";
+mdfileBtn.style.height = "6rem";
+mdfileBtn.style.backgroundColor = "rgb(119, 0, 0)";
+mdfileBtn.style.color = "white";
+mdfileBtn.style.border = "none";
+mdfileBtn.style.fontSize = "0.8rem";
+mdfileBtn.style.cursor = "pointer";
+mdfileBtn.onclick = () => mdfileInput.click();
+
+function renderMarkdown(mdText) {
+    document.getElementById('markdown-content').innerHTML = marked.parse(mdText || "");
+    addMdDeleteBtn();
+}
+
+function addMdDeleteBtn() {
+    let oldBtn = document.getElementById('md-delete-btn');
+    if (oldBtn) oldBtn.remove();
+    if (localStorage.getItem('markdown-content')) {
+        const delBtn = document.createElement("button");
+        delBtn.id = "md-delete-btn";
+        delBtn.textContent = "Del mdfile";
+        mdfileBtn.style.width = "6rem";
+        mdfileBtn.style.height = "6rem";
+        mdfileBtn.style.backgroundColor = "rgb(119, 0, 0)";
+        mdfileBtn.style.color = "white";
+        mdfileBtn.style.border = "none";
+        mdfileBtn.style.fontSize = "0.8rem";
+        mdfileBtn.style.cursor = "pointer";
+        delBtn.onclick = function () {
+            localStorage.removeItem('markdown-content');
+            renderMarkdown("");
+            delBtn.remove();
+        };
+        document.getElementById('markdown-content').after(delBtn);
+    }
+}
+
+mdfileInput.addEventListener('change', function (e) {
+    const file = e.target.files[0];
+    if (!file) return;
+    const reader = new FileReader();
+    reader.onload = function (evt) {
+        const mdText = evt.target.result;
+        localStorage.setItem('markdown-content', mdText);
+        renderMarkdown(mdText);
+    };
+    reader.readAsText(file);
+});
+
+window.addEventListener('DOMContentLoaded', function () {
+    const savedMd = localStorage.getItem('markdown-content');
+    if (savedMd) renderMarkdown(savedMd);
+});
+
+    </script>
+
+</body>
+<style>
+    body {
+        background-color: rgb(66, 0, 0);
+        line-height: 1.5;
+        margin:5rem 0 5rem 0;
+        padding: 0;
+        align-items: center;
+        display:flex;
+        flex-direction: column;
+        gap:3rem;
+    }
+    .box{
+        width:20rem;
+        height:20rem;
+        border-radius:3rem;
+        justify-content:center;
+        background-color: rgb(148, 0, 0);
+        transition: 1500ms ease-in-out;
+        margin-bottom: 2rem;
+    }
+    .box:hover{
+        background-color: rgb(66, 0, 0);
+        transform:rotate(360deg);
+    }
+    .box h2{
+        font-size: 3rem;
+        color: transparent;
+        -webkit-text-stroke: 1px rgb(255, 255, 255);
+        font-weight: bold;
+    }
+    button {
+        width:6rem;
+        height:6rem;
+        background-color: rgb(119, 0, 0);
+        color: white;
+        padding: 10px;
+        border: none;
+        border-radius: 100%;
+        cursor: pointer;
+        opacity:0.85
+    }
+    button:hover{
+        animation:xuanzhuan 2s ease-out infinite;
+    }
+    @keyframes xuanzhuan{
+        0%{
+            transform:rotate(0deg);
+        }
+        50%{
+            transform:rotate(180deg);
+            scale:1.5;
+            border-radius: 2rem;
+            background-color: rgb(66, 0, 0);
+        }
+        100%{
+            transform:rotate(360deg);
+            border-radius: 100%;
+            scale:1;
+        }
+    }
+
+#markdown-content {
+    color: rgba(255, 255, 255,0.75);
+    background: rgba(148,0,0,0.3);
+    padding: 2rem;
+    border-radius: 1rem;
+    font-size: 1.2rem;
+    line-height: 1.8;
+    margin-top: 2rem;
+    width: 61.8%;
+    box-shadow: 0 0 2px rgb(119, 0, 0);
+}
+#markdown-content h1, 
+#markdown-content h2, 
+#markdown-content h3 {
+    color: transparent;
+    -webkit-text-stroke: 1px rgba(255, 255, 255);
+    margin-top: 0.5rem;
+}
+#markdown-content a {
+    color: #4ec9b0;
+    text-decoration: underline;
+}
+#markdown-content code {
+    background: #222;
+    color: #ffb86c;
+    padding: 0.2em 0.4em;
+    border-radius: 0.3em;
+}
+#markdown-content pre {
+    background: #222;
+    color: #ffb86c;
+    padding: 1em;
+    border-radius: 0.5em;
+    overflow-x: auto;
+}
+
+
+
+</style>
+</html>
